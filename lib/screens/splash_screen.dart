@@ -21,10 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> checkLoginAndNavigate(BuildContext context) async {
     final isLoggedIn = widget.authController.isLoggedIn();
-    print(isLoggedIn.toString());
 
     if (isLoggedIn) {
-      print(isLoggedIn.toString());
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
       Navigator.of(context).pushReplacementNamed('/login');

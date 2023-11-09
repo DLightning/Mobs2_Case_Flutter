@@ -4,7 +4,7 @@ import 'package:flutter_app/controllers/auth_controller.dart';
 class HomeScreen extends StatelessWidget {
   final AuthController authController;
 
-  HomeScreen(this.authController);
+  const HomeScreen(this.authController, {super.key});
 
   void _logOut(BuildContext context) async {
     await authController.logout();
@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: const Text('Home'),
       ),
       body: Center(
         child: Column(
@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
             // Your home screen content
             ElevatedButton(
               onPressed: () => _logOut(context), // Pass the context
-              child: Text('Log Out'),
+              child: const Text('Log Out'),
             ),
           ],
         ),
