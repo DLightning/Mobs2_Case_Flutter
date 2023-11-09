@@ -21,9 +21,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Your home screen content
             ElevatedButton(
-              onPressed: () => _logOut(context), // Pass the context
+              onPressed: () => _logOut(context),
               child: const Text('Log Out'),
             ),
           ],

@@ -12,6 +12,7 @@ class AuthController {
     await prefs.setString('password', password);
   }
 
+  //not using
   User? getUserData() {
     final username = prefs.getString('username');
     final password = prefs.getString('password');
@@ -21,11 +22,13 @@ class AuthController {
     return null;
   }
 
+  //not using
   Future<void> updateUser(String username, String newPassword) async {
     await prefs.setString('username', username);
     await prefs.setString('password', newPassword);
   }
 
+  //not using
   Future<void> deleteUser() async {
     await prefs.remove('username');
     await prefs.remove('password');
