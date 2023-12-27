@@ -4,7 +4,7 @@ import 'package:flutter_app/controllers/auth_controller.dart';
 class LoginScreen extends StatefulWidget {
   final AuthController authController;
 
-  const LoginScreen(this.authController, {super.key});
+  const LoginScreen({Key? key, required this.authController}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -14,7 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _login() async {
+  Future<void> _login() async {
     final username = _usernameController.text;
     final password = _passwordController.text;
 
@@ -23,26 +23,29 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success) {
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
-      // ignore: use_build_context_synchronously
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Login Error'),
-            content:
-                const Text('Invalid username or password. Please try again.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      _showErrorDialog();
     }
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Error'),
+          content:
+              const Text('Invalid username or password. Please try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -54,13 +57,25 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextField(
               controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
+              decoration: InputDecoration(
+                labelText: 'Username',
+                border: OutlineInputBorder(),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              ),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              ),
               obscureText: true,
             ),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _login,
               child: const Text('Login'),

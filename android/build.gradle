@@ -16,14 +16,23 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    afterEvaluate {
+        if (project.hasProperty("android")) {
+            android {
+                compileSdkVersion 33
+                defaultConfig {
+                    targetSdkVersion 30
+                    minSdkVersion 21
+                }
+            }
+        }
+    }
 }
 
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
