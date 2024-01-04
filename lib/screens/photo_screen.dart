@@ -35,7 +35,6 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
 
   @override
   void dispose() {
-    // Dispose da câmera se estiver inicializada
     if (_cameraController.value.isInitialized) {
       _cameraController.dispose();
     }
@@ -116,7 +115,6 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
       _cameraController = CameraController(cameras[0], ResolutionPreset.medium);
       await _cameraController.initialize();
     } else {
-      // Lide com a situação em que não há câmeras disponíveis
       print('No cameras available');
     }
   }
@@ -142,8 +140,8 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
       final XFile image = await _cameraController.takePicture();
 
       setState(() {
-        _image = File(image.path); // Atualizado para usar File(image.path)
-        _openPreviewScreen(_image!); // Movido para dentro do setState
+        _image = File(image.path);
+        _openPreviewScreen(_image!);
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -165,12 +163,11 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
           description: descriptionController.text,
           rating: 0,
           imagePath: File(_image!.path).path,
-          latitude: 0.0, // Substitua pela latitude real
-          longitude: 0.0, // Substitua pela longitude real
+          latitude: 0.0, //  latitude real
+          longitude: 0.0, // longitude real
           timestamp: DateTime.now(),
         );
 
-        // Salva a foto no perfil do usuário usando o AuthController
         await _authController.savePhoto(photo);
 
         ScaffoldMessenger.of(context).showSnackBar(

@@ -64,7 +64,6 @@ class _PreviewPhotoViewState extends State<PreviewPhotoView> {
                           size: 30,
                         ),
                         onPressed: () {
-                          // Adicione aqui a lógica para confirmar a foto
                           Navigator.pop(context, widget.file);
                         },
                       ),
@@ -82,7 +81,6 @@ class _PreviewPhotoViewState extends State<PreviewPhotoView> {
                           size: 30,
                         ),
                         onPressed: () {
-                          // Adicione aqui a lógica para fechar a tela
                           Navigator.pop(context);
                         },
                       ),

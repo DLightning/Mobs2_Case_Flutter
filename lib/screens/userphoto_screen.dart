@@ -24,7 +24,7 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   @override
   void initState() {
     super.initState();
-    // Verifica se o authController foi passado e o inicializa
+
     _initializeAuthController();
     _loadUserPhotos();
   }
@@ -35,7 +35,6 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   }
 
   Future<void> _loadUserPhotos() async {
-    // Obtém o ID do usuário usando AuthController
     String? userId = await _authController.getUserId();
 
     if (userId == null) {
@@ -59,7 +58,6 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
                   title: Text(photo.name),
                   subtitle: Text(photo.description),
                   leading: Image.file(File(photo.imagePath)),
-                  // Adicione outros widgets conforme necessário para exibir informações adicionais
                 );
               },
             ),
