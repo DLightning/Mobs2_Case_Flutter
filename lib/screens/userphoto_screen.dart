@@ -19,14 +19,14 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   final PhotoController _photoController = PhotoController();
 
   late AuthController _authController;
-  late List<Photo> _userPhotos;
+  late List<Photo> _userPhotos = [];
 
   @override
   void initState() {
     super.initState();
-
-    _initializeAuthController();
-    _loadUserPhotos();
+    _initializeAuthController().then((_) {
+      _loadUserPhotos();
+    });
   }
 
   Future<void> _initializeAuthController() async {
@@ -35,11 +35,17 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   }
 
   Future<void> _loadUserPhotos() async {
+    // Ensure _authController is not null before using it
+    if (_authController == null) {
+      return;
+    }
+
     String? userId = await _authController.getUserId();
 
     if (userId == null) {
       return;
     }
+
     _userPhotos = await _photoController.getUserPhotos(userId);
     setState(() {});
   }
@@ -47,7 +53,6 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('User Photos')),
       body: _userPhotos.isEmpty
           ? Center(child: Text('No photos available.'))
           : ListView.builder(

@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_app/controllers/auth_controller.dart';
 import 'package:flutter_app/screens/photo_screen.dart';
-import 'package:flutter_app/controllers/photo_controller.dart';
-import 'package:flutter_app/model/photo.dart';
 import 'package:flutter_app/screens/userphoto_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,6 +14,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late AuthController _authController;
+  int _currentIndex = 0;
+  final List<Widget> _screens = [
+    Placeholder(),
+    PhotoCaptureView(),
+    Placeholder(), // Placeholder para o ícone de logout
+  ];
 
   @override
   void initState() {
@@ -34,38 +36,36 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Test'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () => _logOut(context),
-              child: const Text('Log Out'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PhotoCaptureView()),
-                );
-              },
-              child: const Text('Go to PhotoCaptureView'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          UserPhotosScreen(authController: _authController)),
-                );
-              },
-              child: const Text('View User Photos'),
-            ),
-          ],
-        ),
+      body: _screens[_currentIndex], // Mostra a tela atual
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            if (index == 2) {
+              // Se o índice for 2, significa que o ícone de logout foi pressionado
+              _logOut(context);
+            } else {
+              // Caso contrário, atualize o índice da tela atual
+              _currentIndex = index;
+            }
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.camera),
+            label: 'Capture Photo',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.exit_to_app),
+            label: 'Logout',
+          ),
+        ],
       ),
     );
   }

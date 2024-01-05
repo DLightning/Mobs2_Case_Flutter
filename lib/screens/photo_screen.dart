@@ -44,7 +44,6 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Photo Capture')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -81,6 +80,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
                     return;
                   } else {
                     _savePhoto();
+                    Navigator.of(context).pushReplacementNamed('/home');
                   }
                 },
                 child: const Text('Save Photo'),
