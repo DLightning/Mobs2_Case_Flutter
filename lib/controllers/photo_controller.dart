@@ -12,7 +12,6 @@ class PhotoController {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$userId.json');
 
-      // Lê o arquivo existente ou cria um novo se não existir
       List<dynamic> data = [];
       if (await file.exists()) {
         final jsonData = await file.readAsString();
