@@ -6,6 +6,7 @@ import 'package:flutter_app/controllers/photo_controller.dart';
 import 'package:flutter_app/model/photo.dart';
 import 'package:flutter_app/screens/preview_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 class PhotoCaptureView extends StatefulWidget {
   @override
@@ -27,6 +28,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     _initializeCamera();
     _photoController = PhotoController();
     _initializeAuthController();
+    _initializeLocationPermissions();
   }
 
   Future<void> _initializeAuthController() async {
@@ -79,8 +81,9 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
                     );
                     return;
                   } else {
-                    _savePhoto();
-                    Navigator.of(context).pushReplacementNamed('/home');
+                    await _savePhoto();
+                    Navigator.popUntil(context, ModalRoute.withName('/home'));
+                    Navigator.pushReplacementNamed(context, '/home');
                   }
                 },
                 child: const Text('Save Photo'),
@@ -157,19 +160,22 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
       String? userId = await _authController.getUserId();
 
       if (userId != null) {
+        // Obter a geolocalização
+        Position position = await _photoController.determineCustomPosition();
+
         var photo = Photo(
           id: '',
           name: nameController.text,
           description: descriptionController.text,
           rating: 0,
           imagePath: File(_image!.path).path,
-          latitude: 0.0, //  latitude real
-          longitude: 0.0, // longitude real
+          latitude: position.latitude,
+          longitude: position.longitude,
           timestamp: DateTime.now(),
         );
 
         await _authController.savePhoto(photo);
-
+        print(position);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Photo saved successfully!'),
@@ -188,6 +194,28 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
           content: Text('Please take a picture first.'),
         ),
       );
+    }
+  }
+
+  Future<void> _initializeLocationPermissions() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied.');
     }
   }
 }

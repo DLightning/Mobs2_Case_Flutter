@@ -55,6 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 70),
+              child: FlutterLogo(
+                size: 40,
+              ),
+            ),
             TextField(
               controller: _usernameController,
               decoration: InputDecoration(

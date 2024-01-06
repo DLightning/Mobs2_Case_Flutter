@@ -15,16 +15,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late AuthController _authController;
   int _currentIndex = 0;
-  final List<Widget> _screens = [
-    Placeholder(),
-    PhotoCaptureView(),
-    Placeholder(), // Placeholder para o ícone de logout
-  ];
+  late List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
     _authController = widget.authController;
+    _screens = [
+      UserPhotosScreen(authController: _authController),
+      PhotoCaptureView(),
+      Placeholder(), // Placeholder para o ícone de logout
+    ];
   }
 
   void _logOut(BuildContext context) async {
@@ -44,10 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) {
           setState(() {
             if (index == 2) {
-              // Se o índice for 2, significa que o ícone de logout foi pressionado
               _logOut(context);
             } else {
-              // Caso contrário, atualize o índice da tela atual
               _currentIndex = index;
             }
           });

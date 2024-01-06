@@ -35,19 +35,32 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   }
 
   Future<void> _loadUserPhotos() async {
-    // Ensure _authController is not null before using it
-    if (_authController == null) {
-      return;
+    try {
+      if (_authController == null) {
+        print('Auth controller is null.');
+        return;
+      }
+
+      String? userId = await _authController.getUserId();
+
+      if (userId == null) {
+        print('User ID is null.');
+        return;
+      }
+
+      List<Photo> userPhotos = await _photoController.getUserPhotos(userId);
+
+      if (userPhotos == null) {
+        print('Error loading user photos.');
+        return;
+      }
+
+      setState(() {
+        _userPhotos = userPhotos;
+      });
+    } catch (e) {
+      print('Error loading user photos: $e');
     }
-
-    String? userId = await _authController.getUserId();
-
-    if (userId == null) {
-      return;
-    }
-
-    _userPhotos = await _photoController.getUserPhotos(userId);
-    setState(() {});
   }
 
   @override

@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class AuthController {
-  final User user = User();
   final SharedPreferences prefs;
   late PhotoController _photoController;
 
@@ -13,24 +12,64 @@ class AuthController {
     _photoController = PhotoController();
   }
 
+  Future<void> addUser(String username, String password) async {
+    final userList = prefs.getStringList('userList') ?? [];
+    final uuid = Uuid();
+    final userId = uuid.v4();
+    userList.add(userId);
+
+    await prefs.setStringList('userList', userList);
+    await prefs.setString('userId_$userId', userId);
+    await prefs.setString('username_$userId', username);
+    await prefs.setString('password_$userId', password);
+  }
+
   Future<void> setUserId(String userId) async {
-    await prefs.setString('userId', userId);
+    await prefs.setString('currentUserId', userId);
   }
 
   Future<String?> getUserId() async {
-    return prefs.getString('userId');
+    return prefs.getString('currentUserId');
   }
 
   Future<void> clearUserId() async {
-    await prefs.remove('userId');
+    await prefs.remove('currentUserId');
+  }
+
+  Future<bool> login(String username, String password) async {
+    final userList = prefs.getStringList('userList') ?? [];
+
+    for (final userId in userList) {
+      final storedUsername = prefs.getString('username_$userId');
+      final storedPassword = prefs.getString('password_$userId');
+
+      if (storedUsername == username && storedPassword == password) {
+        await setUserId(userId);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool isLoggedIn() {
+    final currentUserId = prefs.getString('currentUserId');
+    return currentUserId != null;
+  }
+
+  Future<void> logout() async {
+    await clearUserId();
   }
 
   Future<void> signUp(String username, String password) async {
-    const uuid = Uuid();
+    final userList = prefs.getStringList('userList') ?? [];
+    final uuid = Uuid();
     final userId = uuid.v4();
-    await prefs.setString('userId', userId);
-    await prefs.setString('username', username);
-    await prefs.setString('password', password);
+    userList.add(userId);
+
+    await prefs.setStringList('userList', userList);
+    await prefs.setString('username_$userId', username);
+    await prefs.setString('password_$userId', password);
   }
 
   //not using
@@ -43,40 +82,9 @@ class AuthController {
     return null;
   }
 
-  //not using
-  Future<void> updateUser(String username, String newPassword) async {
-    await prefs.setString('username', username);
-    await prefs.setString('password', newPassword);
-  }
-
-  //not using
   Future<void> deleteUser() async {
     await prefs.remove('username');
     await prefs.remove('password');
-  }
-
-  Future<bool> login(String username, String password) async {
-    final storedUsername = prefs.getString('username');
-    final storedPassword = prefs.getString('password');
-
-    if (storedUsername == username && storedPassword == password) {
-      await prefs.setBool('isLoggedIn', true);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  bool isLoggedIn() {
-    final storedUsername = prefs.getString('username');
-    final storedPassword = prefs.getString('password');
-    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    return isLoggedIn && storedUsername != null && storedPassword != null;
-  }
-
-  Future<void> logout() async {
-    await prefs.setBool('isLoggedIn', false);
   }
 
   // auth_controller.dart
