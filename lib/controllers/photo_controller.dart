@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_app/model/photo.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class PhotoController {
   Future<void> savePhoto(Photo photo, String userId) async {
@@ -10,8 +11,7 @@ class PhotoController {
 
       List<String> data = prefs.getStringList(userId) ?? [];
 
-      // Adiciona a nova foto aos dados do usuário
-      data.add(json.encode({
+      data.add(jsonEncode({
         'id': photo.id,
         'name': photo.name,
         'description': photo.description,
@@ -34,10 +34,19 @@ class PhotoController {
       final prefs = await SharedPreferences.getInstance();
       List<String> data = prefs.getStringList(userId) ?? [];
 
-      // Converte os dados para a lista de objetos Photo
-      final List<Photo> userPhotos = data
-          .map((jsonString) => Photo.fromJson(json.decode(jsonString)))
-          .toList();
+      final List<Photo> userPhotos = data.map((jsonString) {
+        final Map<String, dynamic> jsonData = json.decode(jsonString);
+        return Photo(
+          id: jsonData['id'],
+          name: jsonData['name'],
+          description: jsonData['description'],
+          rating: jsonData['rating'],
+          imagePath: jsonData['imagePath'],
+          latitude: jsonData['latitude'],
+          longitude: jsonData['longitude'],
+          timestamp: DateTime.parse(jsonData['timestamp']),
+        );
+      }).toList();
 
       return userPhotos;
     } catch (e) {
@@ -67,6 +76,38 @@ class PhotoController {
         speed: 0,
         speedAccuracy: 0,
       );
+    }
+  }
+
+  Future<void> updatePhoto(Photo updatedPhoto, String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<String> data = prefs.getStringList(userId) ?? [];
+
+      final String updatedPhotoId = updatedPhoto.id;
+      final int index = data.indexWhere((jsonPhoto) {
+        final existingPhoto = Photo.fromJson(json.decode(jsonPhoto));
+        return existingPhoto.id == updatedPhotoId;
+      });
+
+      if (index != -1) {
+        // Atualiza os campos necessários
+        final Map<String, dynamic> jsonPhoto = json.decode(data[index]);
+        jsonPhoto['name'] = updatedPhoto.name;
+        jsonPhoto['description'] = updatedPhoto.description;
+        jsonPhoto['rating'] = updatedPhoto.rating;
+        // Adicione outros campos que deseja atualizar
+
+        // Converte de volta para JSON e substitui no lugar
+        data[index] = json.encode(jsonPhoto);
+
+        // Salva os dados atualizados no SharedPreferences
+        await prefs.setStringList(userId, data);
+      } else {
+        print('Photo not found for update: $updatedPhotoId');
+      }
+    } catch (e) {
+      print('Error updating photo: $e');
     }
   }
 }

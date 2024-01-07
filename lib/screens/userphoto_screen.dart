@@ -5,6 +5,7 @@ import 'package:flutter_app/controllers/auth_controller.dart';
 import 'package:flutter_app/controllers/photo_controller.dart';
 import 'package:flutter_app/model/photo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class UserPhotosScreen extends StatefulWidget {
   final AuthController? authController;
@@ -20,6 +21,7 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
 
   late AuthController _authController;
   late List<Photo> _userPhotos = [];
+  late String userId;
 
   @override
   void initState() {
@@ -41,7 +43,8 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
         return;
       }
 
-      String? userId = await _authController.getUserId();
+      userId =
+          (await _authController.getUserId())!; // Atribui o valor de userId
 
       if (userId == null) {
         print('User ID is null.');
@@ -74,7 +77,30 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
                 final photo = _userPhotos[index];
                 return ListTile(
                   title: Text(photo.name),
-                  subtitle: Text(photo.description),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(photo.description),
+                      RatingBar.builder(
+                        initialRating: photo.rating.toDouble(),
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: false,
+                        itemCount: 5,
+                        itemSize: 20,
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        onRatingUpdate: (rating) {
+                          setState(() {
+                            photo.rating = rating.toInt();
+                          });
+                          _photoController.updatePhoto(photo, userId);
+                        },
+                      ),
+                    ],
+                  ),
                   leading: Image.file(File(photo.imagePath)),
                 );
               },

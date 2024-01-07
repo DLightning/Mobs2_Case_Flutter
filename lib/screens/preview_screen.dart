@@ -53,12 +53,12 @@ class _PreviewPhotoViewState extends State<PreviewPhotoView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(32),
                     child: CircleAvatar(
                       radius: 32,
                       backgroundColor: Colors.black.withOpacity(0.5),
                       child: IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.check,
                           color: Colors.white,
                           size: 30,
@@ -70,12 +70,12 @@ class _PreviewPhotoViewState extends State<PreviewPhotoView> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(32),
                     child: CircleAvatar(
                       radius: 32,
                       backgroundColor: Colors.black.withOpacity(0.5),
                       child: IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.close,
                           color: Colors.white,
                           size: 30,

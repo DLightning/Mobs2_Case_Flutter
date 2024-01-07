@@ -1,12 +1,12 @@
 class Photo {
-  final String id;
-  final String name;
-  final String description;
-  final String imagePath;
-  final int rating;
-  final double latitude;
-  final double longitude;
-  final DateTime timestamp;
+  String id;
+  String name;
+  String description;
+  String imagePath;
+  int rating;
+  double latitude;
+  double longitude;
+  DateTime timestamp;
 
   Photo({
     required this.id,

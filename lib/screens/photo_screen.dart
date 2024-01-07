@@ -7,6 +7,7 @@ import 'package:flutter_app/model/photo.dart';
 import 'package:flutter_app/screens/preview_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:uuid/uuid.dart';
 
 class PhotoCaptureView extends StatefulWidget {
   @override
@@ -59,18 +60,18 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
                         await _initializeCamera();
                         await _takePicture();
                       },
-                      child: Text('Take Picture'),
+                      child: const Text('Take Picture'),
                     ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(labelText: 'Name'),
               ),
               TextField(
                 controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () async {
                   if (_image == null) {
@@ -99,14 +100,14 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     return Column(
       children: [
         Image.file(_image!, fit: BoxFit.cover),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         ElevatedButton(
           onPressed: () {
             setState(() {
               _image = null;
             });
           },
-          child: Text('Remove Photo'),
+          child: const Text('Remove Photo'),
         ),
       ],
     );
@@ -162,9 +163,9 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
       if (userId != null) {
         // Obter a geolocalização
         Position position = await _photoController.determineCustomPosition();
-
+        const uuid = Uuid();
         var photo = Photo(
-          id: '',
+          id: uuid.v4(),
           name: nameController.text,
           description: descriptionController.text,
           rating: 0,
