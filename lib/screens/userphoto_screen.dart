@@ -102,9 +102,49 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
                     ],
                   ),
                   leading: Image.file(File(photo.imagePath)),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    color: Colors.red,
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Delete Photo'),
+                            content: Text(
+                                'Are you sure you want to delete this photo?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  await deletePhoto(photo);
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),
     );
+  }
+
+  Future<void> deletePhoto(Photo photo) async {
+    try {
+      await _photoController.deletePhoto(photo.id, userId);
+      _loadUserPhotos();
+    } catch (e) {
+      print('Error deleting photo: $e');
+    }
   }
 }

@@ -65,6 +65,7 @@ class _PreviewPhotoViewState extends State<PreviewPhotoView> {
                         ),
                         onPressed: () {
                           Navigator.pop(context, widget.file);
+                          isFlashOn = false;
                         },
                       ),
                     ),
@@ -81,6 +82,7 @@ class _PreviewPhotoViewState extends State<PreviewPhotoView> {
                           size: 30,
                         ),
                         onPressed: () {
+                          isFlashOn = false;
                           Navigator.pop(context);
                         },
                       ),

@@ -110,4 +110,21 @@ class PhotoController {
       print('Error updating photo: $e');
     }
   }
+
+  Future<void> deletePhoto(String photoId, String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<String> data = prefs.getStringList(userId) ?? [];
+
+      data.removeWhere((jsonPhoto) {
+        final existingPhoto = Photo.fromJson(json.decode(jsonPhoto));
+        return existingPhoto.id == photoId;
+      });
+
+      // Salva os dados atualizados no SharedPreferences
+      await prefs.setStringList(userId, data);
+    } catch (e) {
+      print('Error deleting photo: $e');
+    }
+  }
 }
