@@ -22,6 +22,7 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   late AuthController _authController;
   late List<Photo> _userPhotos = [];
   late String userId;
+  Map<String, String> locationNames = {};
 
   @override
   void initState() {
@@ -43,8 +44,7 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
         return;
       }
 
-      userId =
-          (await _authController.getUserId())!; // Atribui o valor de userId
+      userId = (await _authController.getUserId())!;
 
       if (userId == null) {
         print('User ID is null.');
@@ -61,8 +61,19 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
       setState(() {
         _userPhotos = userPhotos;
       });
+      await _updateLocationNames();
     } catch (e) {
       print('Error loading user photos: $e');
+    }
+  }
+
+  Future<void> _updateLocationNames() async {
+    for (var photo in _userPhotos) {
+      String locationName = await _photoController.getLocationName(
+          photo.latitude, photo.longitude);
+      setState(() {
+        locationNames[photo.id] = locationName;
+      });
     }
   }
 
@@ -70,68 +81,111 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _userPhotos.isEmpty
-          ? Center(child: Text('No photos available.'))
+          ? const Center(child: Text('No photos available.'))
           : ListView.builder(
               itemCount: _userPhotos.length,
               itemBuilder: (context, index) {
                 final photo = _userPhotos[index];
-                return ListTile(
-                  title: Text(photo.name),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(photo.description),
-                      RatingBar.builder(
-                        initialRating: photo.rating.toDouble(),
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        allowHalfRating: false,
-                        itemCount: 5,
-                        itemSize: 20,
-                        itemBuilder: (context, _) => Icon(
-                          Icons.star,
-                          color: Colors.amber,
+
+                String locationName =
+                    locationNames[photo.id] ?? 'Loading location...';
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Image.file(
+                          File(photo.imagePath),
+                          height: 200,
+                          fit: BoxFit.cover,
                         ),
-                        onRatingUpdate: (rating) {
-                          setState(() {
-                            photo.rating = rating.toInt();
-                          });
-                          _photoController.updatePhoto(photo, userId);
-                        },
-                      ),
-                    ],
-                  ),
-                  leading: Image.file(File(photo.imagePath)),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    color: Colors.red,
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Delete Photo'),
-                            content: Text(
-                                'Are you sure you want to delete this photo?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Cancel'),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                photo.name,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              TextButton(
-                                onPressed: () async {
-                                  await deletePhoto(photo);
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Delete'),
+                              const SizedBox(height: 8),
+                              Text(photo.description),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  RatingBar.builder(
+                                    initialRating: photo.rating.toDouble(),
+                                    minRating: 1,
+                                    direction: Axis.horizontal,
+                                    allowHalfRating: false,
+                                    itemCount: 5,
+                                    itemSize: 20,
+                                    itemBuilder: (context, _) => const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                    ),
+                                    onRatingUpdate: (rating) {
+                                      setState(() {
+                                        photo.rating = rating.toInt();
+                                      });
+                                      _photoController.updatePhoto(
+                                          photo, userId);
+                                    },
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.location_on),
+                                  Text(locationName),
+                                  const Spacer(),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('Delete Photo'),
+                                            content: const Text(
+                                                'Are you sure you want to delete this photo?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () async {
+                                                  await deletePhoto(photo);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('Delete'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Horario: ${photo.timestamp.toLocal()}',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                ),
                               ),
                             ],
-                          );
-                        },
-                      );
-                    },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

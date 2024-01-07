@@ -58,7 +58,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
                   : ElevatedButton(
                       onPressed: () async {
                         await _initializeCamera();
-                        await _takePicture();
+                        await _checkAndTakePicture();
                       },
                       child: const Text('Take Picture'),
                     ),
@@ -117,7 +117,8 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     final cameras = await availableCameras();
     if (cameras.isNotEmpty) {
       _cameraController = CameraController(cameras[0], ResolutionPreset.medium);
-      await _cameraController.initialize();
+      _cameraInitialization = _cameraController.initialize();
+      await _cameraInitialization;
     } else {
       print('No cameras available');
     }
@@ -137,10 +138,26 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     return result == true;
   }
 
+  Future<void> _checkAndTakePicture() async {
+    await _initializeLocationPermissions();
+
+    final permissionStatus = await _getLocationPermissionStatus();
+
+    if (permissionStatus == LocationPermission.always ||
+        permissionStatus == LocationPermission.whileInUse) {
+      await _takePicture();
+    } else {}
+  }
+
+  Future<LocationPermission> _getLocationPermissionStatus() async {
+    return await Geolocator.checkPermission();
+  }
+
   Future<void> _takePicture() async {
     String? userId = await _authController.getUserId();
 
     if (userId != null) {
+      await _cameraInitialization;
       final XFile image = await _cameraController.takePicture();
 
       setState(() {
@@ -161,7 +178,6 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
       String? userId = await _authController.getUserId();
 
       if (userId != null) {
-        // Obter a geolocalização
         Position position = await _photoController.determineCustomPosition();
         const uuid = Uuid();
         var photo = Photo(

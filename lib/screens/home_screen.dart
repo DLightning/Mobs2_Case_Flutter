@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _screens = [
       UserPhotosScreen(authController: _authController),
       PhotoCaptureView(),
-      Placeholder(), // Placeholder para o ícone de logout
+      const Placeholder(),
     ];
   }
 
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Test'),
       ),
-      body: _screens[_currentIndex], // Mostra a tela atual
+      body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_app/model/photo.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 class PhotoController {
   Future<void> savePhoto(Photo photo, String userId) async {
@@ -22,7 +23,6 @@ class PhotoController {
         'timestamp': photo.timestamp.toIso8601String(),
       }));
 
-      // Salva os dados no SharedPreferences
       await prefs.setStringList(userId, data);
     } catch (e) {
       print('Error saving photo: $e');
@@ -91,17 +91,13 @@ class PhotoController {
       });
 
       if (index != -1) {
-        // Atualiza os campos necessários
         final Map<String, dynamic> jsonPhoto = json.decode(data[index]);
         jsonPhoto['name'] = updatedPhoto.name;
         jsonPhoto['description'] = updatedPhoto.description;
         jsonPhoto['rating'] = updatedPhoto.rating;
-        // Adicione outros campos que deseja atualizar
 
-        // Converte de volta para JSON e substitui no lugar
         data[index] = json.encode(jsonPhoto);
 
-        // Salva os dados atualizados no SharedPreferences
         await prefs.setStringList(userId, data);
       } else {
         print('Photo not found for update: $updatedPhotoId');
@@ -121,10 +117,28 @@ class PhotoController {
         return existingPhoto.id == photoId;
       });
 
-      // Salva os dados atualizados no SharedPreferences
       await prefs.setStringList(userId, data);
     } catch (e) {
       print('Error deleting photo: $e');
+    }
+  }
+
+  Future<String> getLocationName(double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty && placemarks[0].locality != null) {
+        String place =
+            '${placemarks[0].subAdministrativeArea.toString()}, ${placemarks[0].country.toString()}';
+        return place;
+      } else {
+        return 'Unknown';
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting location name: $e');
+      }
+      return 'Unknown';
     }
   }
 }

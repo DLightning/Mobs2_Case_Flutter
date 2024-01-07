@@ -14,7 +14,7 @@ class AuthController {
 
   Future<void> addUser(String username, String password) async {
     final userList = prefs.getStringList('userList') ?? [];
-    final uuid = Uuid();
+    const uuid = Uuid();
     final userId = uuid.v4();
     userList.add(userId);
 
@@ -63,7 +63,7 @@ class AuthController {
 
   Future<void> signUp(String username, String password) async {
     final userList = prefs.getStringList('userList') ?? [];
-    final uuid = Uuid();
+    const uuid = Uuid();
     final userId = uuid.v4();
     userList.add(userId);
 

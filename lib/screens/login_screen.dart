@@ -57,27 +57,27 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Container(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 70),
-              child: FlutterLogo(
+              child: const FlutterLogo(
                 size: 40,
               ),
             ),
             TextField(
               controller: _usernameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Username',
                 border: OutlineInputBorder(),
                 contentPadding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
                 contentPadding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               ),
               obscureText: true,
             ),
