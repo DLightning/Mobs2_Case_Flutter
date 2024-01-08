@@ -7,11 +7,13 @@ import 'package:flutter_app/model/photo.dart';
 import 'package:flutter_app/screens/editphoto_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 
 class UserPhotosScreen extends StatefulWidget {
   final AuthController? authController;
 
-  UserPhotosScreen({Key? key, required this.authController}) : super(key: key);
+  const UserPhotosScreen({Key? key, required this.authController})
+      : super(key: key);
 
   @override
   _UserPhotosScreenState createState() => _UserPhotosScreenState();
@@ -190,9 +192,9 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 5),
                                 Text(
-                                  'DateTime: ${photo.timestamp.toLocal()}',
+                                  ' ${converterDateTimeParaString(photo.timestamp.toLocal())}',
                                   style: const TextStyle(
                                     color: Colors.grey,
                                   ),
@@ -217,5 +219,12 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
     } catch (e) {
       print('Error deleting photo: $e');
     }
+  }
+
+  String converterDateTimeParaString(DateTime dateTime) {
+    String formatoDataHora = 'dd/MM/yyyy HH:mm';
+    String stringFormatada = DateFormat(formatoDataHora).format(dateTime);
+
+    return stringFormatada;
   }
 }

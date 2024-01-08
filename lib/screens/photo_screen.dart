@@ -11,6 +11,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
 
 class PhotoCaptureView extends StatefulWidget {
+  const PhotoCaptureView({super.key});
+
   @override
   _PhotoCaptureViewState createState() => _PhotoCaptureViewState();
 }
@@ -23,13 +25,13 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   late CameraController _cameraController;
   late Future<void> _cameraInitialization;
   File? _image;
-  late XFile? _picture;
+  //late XFile? _picture;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _picture = null;
+    //_picture = null;
     _initializeCamera();
     _photoController = PhotoController();
     _initializeAuthController();
@@ -213,7 +215,11 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
       _cameraInitialization = _cameraController.initialize();
       await _cameraInitialization;
     } else {
-      print('No cameras available');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No cameras available'),
+        ),
+      );
     }
   }
 
@@ -228,6 +234,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     } else {
       return null;
     }
+    return null;
   }
 
   Future<LocationPermission> _getLocationPermissionStatus() async {
@@ -285,7 +292,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
           );
 
           await _authController.savePhoto(photo);
-          print(position);
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Photo saved successfully!'),

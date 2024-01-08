@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _authController = widget.authController;
     _screens = [
       UserPhotosScreen(authController: _authController),
-      PhotoCaptureView(),
+      const PhotoCaptureView(),
       const Placeholder(),
     ];
   }

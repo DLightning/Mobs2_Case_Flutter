@@ -7,7 +7,7 @@ class EditPhotoView extends StatefulWidget {
   final Photo photo;
   final String userId; // Adicione esta linha
 
-  EditPhotoView({Key? key, required this.photo, required this.userId})
+  const EditPhotoView({Key? key, required this.photo, required this.userId})
       : super(key: key);
 
   @override
@@ -47,7 +47,7 @@ class _EditPhotoViewState extends State<EditPhotoView> {
                 ),
                 elevation: 5,
                 child: Container(
-                  height: 450,
+                  height: 400,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
@@ -64,83 +64,51 @@ class _EditPhotoViewState extends State<EditPhotoView> {
               ),
               const SizedBox(height: 5),
               Card(
-                color: const Color.fromARGB(255, 219, 219, 219),
                 elevation: 5,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (!isEditing)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              widget.photo.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                setState(() {
-                                  isEditing = true;
-                                });
-                              },
-                            ),
-                          ],
+                      TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(labelText: 'Title'),
+                      ),
+                      const SizedBox(height: 15),
+                      TextField(
+                        controller: descriptionController,
+                        maxLines: 5,
+                        decoration: const InputDecoration(
+                          labelText: 'Description',
+                          border: OutlineInputBorder(),
                         ),
-                      if (isEditing)
-                        TextField(
-                          controller: nameController,
-                          decoration: const InputDecoration(labelText: 'Title'),
-                        ),
-                      const SizedBox(height: 12),
-                      if (!isEditing)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              widget.photo.description,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      if (isEditing)
-                        TextField(
-                          controller: descriptionController,
-                          maxLines: 5,
-                          decoration: const InputDecoration(
-                            labelText: 'Description',
-                            border: OutlineInputBorder(),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
+                          backgroundColor: Colors.cyan,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 40),
                         ),
-                      const SizedBox(height: 16),
-                      if (isEditing)
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            backgroundColor: Colors.cyan,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 50),
-                          ),
-                          onPressed: () {
-                            widget.photo.name = nameController.text;
-                            widget.photo.description =
-                                descriptionController.text;
-                            _photoController.updatePhoto(
-                                widget.photo, widget.userId);
+                        onPressed: () {
+                          widget.photo.name = nameController.text;
+                          widget.photo.description = descriptionController.text;
+                          _photoController.updatePhoto(
+                              widget.photo, widget.userId);
+                          Navigator.popUntil(
+                              context, ModalRoute.withName('/home'));
+                          Navigator.pushReplacementNamed(context, '/home');
 
-                            setState(() {
-                              isEditing = false;
-                            });
-                          },
-                          child: const Text('Save Changes'),
-                        ),
+                          setState(() {
+                            isEditing = false;
+                          });
+                        },
+                        child: const Text('Save Changes'),
+                      ),
                     ],
                   ),
                 ),

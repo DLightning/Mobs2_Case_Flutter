@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(authController: authController),
         '/signup': (context) => SignupScreen(authController),
         '/home': (context) => HomeScreen(authController),
-        '/photo': (context) => PhotoCaptureView(),
+        '/photo': (context) => const PhotoCaptureView(),
       },
     );
   }
