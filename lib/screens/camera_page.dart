@@ -96,7 +96,7 @@ class _CameraPageState extends State<CameraPage> {
                 Expanded(
                     child: IconButton(
                   onPressed: takePicture,
-                  iconSize: 50,
+                  iconSize: 70,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   icon: const Icon(Icons.circle, color: Colors.white),

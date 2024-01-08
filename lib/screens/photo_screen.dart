@@ -24,6 +24,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   late Future<void> _cameraInitialization;
   File? _image;
   late XFile? _picture;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -50,89 +51,118 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _image != null
-                  ? _buildImagePreview()
-                  : Column(
-                      children: [
-                        Container(
-                          height: 300,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey, width: 2.0),
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: SizedBox.shrink(),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _image != null
+                      ? _buildImagePreview()
+                      : Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                await _initializeCamera();
+                                XFile? picture = await _checkAndTakePicture();
+                                if (picture != null) {
+                                  setState(() {
+                                    _image = File(picture.path);
+                                  });
+                                }
+                              },
+                              child: Container(
+                                height: 300,
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(255, 199, 198, 198),
+                                  border: Border.all(
+                                      color: Colors.black, width: 2.0),
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.camera_alt,
+                                      size: 50,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Insert Photo Here',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                            backgroundColor: Colors.cyan,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 30),
-                          ),
-                          onPressed: () async {
-                            await _initializeCamera();
-                            XFile? picture = await _checkAndTakePicture();
-                            if (picture != null) {
-                              setState(() {
-                                _image = File(picture.path);
-                              });
-                            }
-                          },
-                          child: Icon(Icons.camera_alt),
+                            const SizedBox(height: 16),
+                          ],
                         ),
-                      ],
-                    ),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Title'),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: descriptionController,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(labelText: 'Title'),
                   ),
-                  backgroundColor: Colors.cyan,
-                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
-                ),
-                onPressed: () async {
-                  if (_image == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please take a picture first.'),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: descriptionController,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                      border: OutlineInputBorder(),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    );
-                    return;
-                  } else {
-                    await _savePhoto();
-                    Navigator.popUntil(context, ModalRoute.withName('/home'));
-                    Navigator.pushReplacementNamed(context, '/home');
-                  }
-                },
-                child: const Text('Save Photo'),
+                      backgroundColor: Colors.cyan,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 50),
+                    ),
+                    onPressed: () async {
+                      if (_image == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please take a picture first.'),
+                          ),
+                        );
+                        return;
+                      } else {
+                        await _savePhoto();
+                        Navigator.popUntil(
+                            context, ModalRoute.withName('/home'));
+                        Navigator.pushReplacementNamed(context, '/home');
+                      }
+                    },
+                    child: const Text('Save Photo'),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.2),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -140,18 +170,30 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   Widget _buildImagePreview() {
     return Column(
       children: [
-        Image.file(_image!,
-            fit: BoxFit.cover,
-            height: 300,
-            width: MediaQuery.of(context).size.width),
-        const SizedBox(height: 16),
+        Container(
+          height: 300,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 2.0),
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18.0),
+            child: Image.file(
+              _image!,
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
             backgroundColor: Colors.red,
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
           ),
           onPressed: () {
             setState(() {
@@ -221,43 +263,52 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   }
 
   Future<void> _savePhoto() async {
-    if (_image != null) {
-      String? userId = await _authController.getUserId();
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      if (_image != null) {
+        String? userId = await _authController.getUserId();
 
-      if (userId != null) {
-        Position position = await _photoController.determineCustomPosition();
-        const uuid = Uuid();
-        var photo = Photo(
-          id: uuid.v4(),
-          name: nameController.text,
-          description: descriptionController.text,
-          rating: 0,
-          imagePath: File(_image!.path).path,
-          latitude: position.latitude,
-          longitude: position.longitude,
-          timestamp: DateTime.now(),
-        );
+        if (userId != null) {
+          Position position = await _photoController.determineCustomPosition();
+          const uuid = Uuid();
+          var photo = Photo(
+            id: uuid.v4(),
+            name: nameController.text,
+            description: descriptionController.text,
+            rating: 0,
+            imagePath: File(_image!.path).path,
+            latitude: position.latitude,
+            longitude: position.longitude,
+            timestamp: DateTime.now(),
+          );
 
-        await _authController.savePhoto(photo);
-        print(position);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Photo saved successfully!'),
-          ),
-        );
+          await _authController.savePhoto(photo);
+          print(position);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Photo saved successfully!'),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to save photo. User ID is null.'),
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to save photo. User ID is null.'),
+            content: Text('Please take a picture first.'),
           ),
         );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please take a picture first.'),
-        ),
-      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
