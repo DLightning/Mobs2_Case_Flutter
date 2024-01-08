@@ -135,20 +135,6 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     }
   }
 
-  /*Future<bool> _openPreviewScreen(File imageFile) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PreviewPhotoView(
-          file: imageFile,
-          cameraController: _cameraController,
-        ),
-      ),
-    );
-
-    return result == true;
-  }*/
-
   Future<XFile?> _checkAndTakePicture() async {
     await _initializeLocationPermissions();
 
@@ -170,7 +156,6 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     String? userId = await _authController.getUserId();
 
     if (userId != null) {
-      // Certifique-se de que 'value' está definido
       List<CameraDescription>? cameras = await availableCameras();
 
       XFile? picture = await Navigator.push(
@@ -184,8 +169,6 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
         setState(() {
           _image = File(picture.path);
         });
-
-        //await _openPreviewScreen(_image!);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -72,7 +72,6 @@ class AuthController {
     await prefs.setString('password_$userId', password);
   }
 
-  //not using
   User? getUserData() {
     final username = prefs.getString('username');
     final password = prefs.getString('password');
@@ -87,7 +86,6 @@ class AuthController {
     await prefs.remove('password');
   }
 
-  // auth_controller.dart
   Future<void> savePhoto(Photo photo) async {
     final userId = await getUserId();
     if (userId != null) {
