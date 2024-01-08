@@ -101,7 +101,18 @@ class _CameraPageState extends State<CameraPage> {
                   constraints: const BoxConstraints(),
                   icon: const Icon(Icons.circle, color: Colors.white),
                 )),
-                const Spacer(),
+                Expanded(
+                    child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  iconSize: 30,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.arrow_back_ios_outlined,
+                      color: Colors.white),
+                )),
+                //const Spacer(),
               ]),
             )),
       ]),

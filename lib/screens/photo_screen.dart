@@ -58,29 +58,62 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
             children: [
               _image != null
                   ? _buildImagePreview()
-                  : ElevatedButton(
-                      onPressed: () async {
-                        await _initializeCamera();
-                        XFile? picture = await _checkAndTakePicture();
-                        if (picture != null) {
-                          setState(() {
-                            _image = File(picture.path);
-                          });
-                        }
-                      },
-                      child: const Text('Take Picture'),
+                  : Column(
+                      children: [
+                        Container(
+                          height: 300,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey, width: 2.0),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: SizedBox.shrink(),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            backgroundColor: Colors.cyan,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 30),
+                          ),
+                          onPressed: () async {
+                            await _initializeCamera();
+                            XFile? picture = await _checkAndTakePicture();
+                            if (picture != null) {
+                              setState(() {
+                                _image = File(picture.path);
+                              });
+                            }
+                          },
+                          child: Icon(Icons.camera_alt),
+                        ),
+                      ],
                     ),
-              const SizedBox(height: 16),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(labelText: 'Title'),
               ),
+              const SizedBox(height: 20),
               TextField(
                 controller: descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  backgroundColor: Colors.cyan,
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+                ),
                 onPressed: () async {
                   if (_image == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -109,10 +142,17 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
       children: [
         Image.file(_image!,
             fit: BoxFit.cover,
-            height: 400,
+            height: 300,
             width: MediaQuery.of(context).size.width),
         const SizedBox(height: 16),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: Colors.red,
+            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+          ),
           onPressed: () {
             setState(() {
               _image = null;
@@ -158,6 +198,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     if (userId != null) {
       List<CameraDescription>? cameras = await availableCameras();
 
+      // ignore: use_build_context_synchronously
       XFile? picture = await Navigator.push(
         context,
         MaterialPageRoute(

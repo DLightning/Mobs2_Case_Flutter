@@ -176,7 +176,7 @@ class _UserPhotosScreenState extends State<UserPhotosScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Horario: ${photo.timestamp.toLocal()}',
+                                'DateTime: ${photo.timestamp.toLocal()}',
                                 style: const TextStyle(
                                   color: Colors.grey,
                                 ),

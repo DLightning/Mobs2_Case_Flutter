@@ -37,7 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Test'),
+        title: const Text('MobsCase'),
+        backgroundColor: Colors.cyan,
+        automaticallyImplyLeading: false,
       ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -54,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
+            backgroundColor: Colors.cyan,
             label: 'Home',
           ),
           BottomNavigationBarItem(

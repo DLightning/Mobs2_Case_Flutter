@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/controllers/auth_controller.dart';
 import 'package:flutter_app/screens/home_screen.dart';
 import 'package:flutter_app/screens/login_screen.dart';
+import 'package:flutter_app/screens/photo_screen.dart';
 import 'package:flutter_app/screens/signup_screen.dart';
 import 'package:flutter_app/screens/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(authController: authController),
         '/signup': (context) => SignupScreen(authController),
         '/home': (context) => HomeScreen(authController),
+        '/photo': (context) => PhotoCaptureView(),
       },
     );
   }
