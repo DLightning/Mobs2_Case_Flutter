@@ -31,7 +31,7 @@ class _EditPhotoViewState extends State<EditPhotoView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MobsCase'),
+        title: const Text('Mobs2 Case'),
         backgroundColor: Colors.cyan,
         automaticallyImplyLeading: false,
       ),
