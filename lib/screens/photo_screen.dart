@@ -4,7 +4,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter_app/controllers/auth_controller.dart';
 import 'package:flutter_app/controllers/photo_controller.dart';
 import 'package:flutter_app/model/photo.dart';
-import 'package:flutter_app/screens/preview_screen.dart';
+import 'package:flutter_app/screens/camera_page.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
@@ -22,10 +23,12 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   late CameraController _cameraController;
   late Future<void> _cameraInitialization;
   File? _image;
+  late XFile? _picture;
 
   @override
   void initState() {
     super.initState();
+    _picture = null;
     _initializeCamera();
     _photoController = PhotoController();
     _initializeAuthController();
@@ -58,7 +61,12 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
                   : ElevatedButton(
                       onPressed: () async {
                         await _initializeCamera();
-                        await _checkAndTakePicture();
+                        XFile? picture = await _checkAndTakePicture();
+                        if (picture != null) {
+                          setState(() {
+                            _image = File(picture.path);
+                          });
+                        }
                       },
                       child: const Text('Take Picture'),
                     ),
@@ -99,7 +107,10 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
   Widget _buildImagePreview() {
     return Column(
       children: [
-        Image.file(_image!, fit: BoxFit.cover),
+        Image.file(_image!,
+            fit: BoxFit.cover,
+            height: 400,
+            width: MediaQuery.of(context).size.width),
         const SizedBox(height: 16),
         ElevatedButton(
           onPressed: () {
@@ -124,7 +135,7 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     }
   }
 
-  Future<bool> _openPreviewScreen(File imageFile) async {
+  /*Future<bool> _openPreviewScreen(File imageFile) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -136,38 +147,50 @@ class _PhotoCaptureViewState extends State<PhotoCaptureView> {
     );
 
     return result == true;
-  }
+  }*/
 
-  Future<void> _checkAndTakePicture() async {
+  Future<XFile?> _checkAndTakePicture() async {
     await _initializeLocationPermissions();
 
     final permissionStatus = await _getLocationPermissionStatus();
 
     if (permissionStatus == LocationPermission.always ||
         permissionStatus == LocationPermission.whileInUse) {
-      await _takePicture();
-    } else {}
+      await _goToPreview();
+    } else {
+      return null;
+    }
   }
 
   Future<LocationPermission> _getLocationPermissionStatus() async {
     return await Geolocator.checkPermission();
   }
 
-  Future<void> _takePicture() async {
+  Future<void> _goToPreview() async {
     String? userId = await _authController.getUserId();
 
     if (userId != null) {
-      await _cameraInitialization;
-      final XFile image = await _cameraController.takePicture();
+      // Certifique-se de que 'value' está definido
+      List<CameraDescription>? cameras = await availableCameras();
 
-      setState(() {
-        _image = File(image.path);
-        _openPreviewScreen(_image!);
-      });
+      XFile? picture = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CameraPage(cameras: cameras),
+        ),
+      );
+
+      if (picture != null) {
+        setState(() {
+          _image = File(picture.path);
+        });
+
+        //await _openPreviewScreen(_image!);
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to save photo. User ID is null.'),
+          content: Text('Failed to take photo. User ID is null.'),
         ),
       );
     }
